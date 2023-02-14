@@ -182,8 +182,8 @@ def nonLinearH(pts1, pts2, H):
     return output.reshape((3, 3))
 
 # read image
-img0 = cv2.imread("flower0000.jpg")
-img1 = cv2.imread("flower0062.jpg")
+img0 = cv2.imread("akiyo0000.jpg")
+img1 = cv2.imread("akiyo0031.jpg")
 matcher = ebma(img0, range=10, blockSize=16, half_pel=False)
 motion = matcher.search(img1)
 pts1, pts2 = matcher.getMatchP()
@@ -196,21 +196,26 @@ delta = 8
 p = 0.99
 n = 4
 
-in0, in01 = ransac(pts1, pts2, n, epsilon, p, delta)
+in0, in01 = ransac(pts2, pts1, n, epsilon, p, delta)
 print("**********RANSAC Finished**********")
 
 H_01 = linearH(in0, in01)
+print(H_01)
 print("**********H Compute Finished**********")
 
 canvas = transform2(img1, img0, H_01, 0, 0)
 print("**********Linear Output Finished**********")
 
-cv2.imwrite('output.jpg', canvas)
-
-H_01 = nonLinearH(in0, in01, H_01)
-print("**********H Compute Finished**********")
-
-canvas = transform2(img1, img0, H_01, 0, 0)
+print(matcher.PSNR(img0, canvas))
+diff = matcher.diff(canvas, img0)
+cv2.imwrite('Diff.jpg', diff.astype(np.uint8))
 
 cv2.imwrite('output.jpg', canvas)
+
+# H_01 = nonLinearH(in0, in01, H_01)
+print("**********NonLinear Finished**********")
+
+# canvas = transform2(img1, img0, H_01, 0, 0)
+
+# cv2.imwrite('output.jpg', canvas)
 print("**********Output Finished**********")

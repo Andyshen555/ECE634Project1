@@ -108,21 +108,23 @@ class hbma:
         self.pts2 = pts2
         return output
 
-    def search(self, img:np.ndarray) -> None:
+    def search(self, img:np.ndarray) -> float:
         motion = self.calculate_motion(img)
         self.motion = motion
         # output = self.warp(motion)
         output = self.output
         diff = self.diff(output, img)
         plotMotion = self.plot_motion(motion)
-        print(self.PSNR(img, output))
         # cv2.imshow('Image', img.astype(np.uint8))
         # cv2.imshow('Anchor frame', self.anchor.astype(np.uint8))
         # cv2.imshow('Warpped output', output.astype(np.uint8))
         # cv2.imshow('Diff', diff.astype(np.uint8))
         # cv2.imshow('Motion', plotMotion.astype(np.uint8))
         # cv2.waitKey(0)
-        return
+        # cv2.imwrite('HBMA-w'+str(self.lev)+'.jpg', output.astype(np.uint8))
+        # cv2.imwrite('HBMA-d'+str(self.lev)+'.jpg', diff.astype(np.uint8))
+        # cv2.imwrite('HBMA-M'+str(self.lev)+'.jpg', plotMotion.astype(np.uint8))
+        return self.PSNR(img, output)
 
     def getMatchP(self):
         return self.pts1, self.pts2
@@ -130,5 +132,7 @@ class hbma:
 
 # img1 = cv2.imread("flower0000.jpg")
 # img2 = cv2.imread("flower0062.jpg")
-# matcher = hbma(img1, range=3, blockSize=16, level=3)
-# matcher.search(img2)
+# for l in [2, 3, 4]:
+#     matcher = hbma(img1, range=5, blockSize=16, level=l)
+#     psnr = matcher.search(img2)
+#     print("PSNR for HBMA of range 6, block size 16 and level "+str(l)+" is", psnr)

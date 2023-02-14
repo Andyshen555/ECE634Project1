@@ -95,7 +95,7 @@ class ebma:
         self.pts2 = pts2
         return output
 
-    def search(self, img:np.ndarray) -> None:
+    def search(self, img:np.ndarray) -> float:
         if self.half:
             img = cv2.resize(img, (self.width, self.height), interpolation = cv2.INTER_LINEAR)
         motion = self.calculate_motion(img)
@@ -104,14 +104,14 @@ class ebma:
         output = self.output
         diff = self.diff(output, img)
         plotMotion = self.plot_motion(motion)
-        print(self.PSNR(img, output))
-        # cv2.imshow('Anchor frame', self.anchor.astype(np.uint8))
-        # cv2.imshow('Image', img.astype(np.uint8))
-        # cv2.imshow('Warpped output', output.astype(np.uint8))
-        # cv2.imshow('Diff', diff.astype(np.uint8))
-        # cv2.imshow('Motion', plotMotion.astype(np.uint8))
-        # cv2.waitKey(0)
-        return
+        # if self.half:
+        #     output = cv2.resize(output, (self.width//2, self.height//2), interpolation = cv2.INTER_LINEAR)
+        #     diff = cv2.resize(diff, (self.width//2, self.height//2), interpolation = cv2.INTER_LINEAR)
+        #     plotMotion = cv2.resize(plotMotion, (self.width//2, self.height//2), interpolation = cv2.INTER_LINEAR)
+        # cv2.imwrite('EBMA-H-w'+str(self.range)+'-'+str(self.blockS)+'.jpg', output.astype(np.uint8))
+        # cv2.imwrite('EBMA-H-d'+str(self.range)+'-'+str(self.blockS)+'.jpg', diff.astype(np.uint8))
+        # cv2.imwrite('EBMA-H-M'+str(self.range)+'-'+str(self.blockS)+'.jpg', plotMotion.astype(np.uint8))
+        return self.PSNR(img, output)
 
     def getMatchP(self):
         return self.pts1, self.pts2
@@ -119,5 +119,8 @@ class ebma:
 
 # img1 = cv2.imread("flower0000.jpg")
 # img2 = cv2.imread("flower0062.jpg")
-# matcher = ebma(img1, range=10, blockSize=16, half_pel=True)
-# matcher.search(img2)
+# for r in [3, 6, 9]:
+#     for blk in [4, 8, 16]:
+#         matcher = ebma(img1, range=r, blockSize=blk, half_pel=True)
+#         psnr = matcher.search(img2)
+#         print("PSNR for half pel EBMA of range "+str(r)+" and block size "+str(blk)+" is", psnr)
